@@ -2,7 +2,7 @@ from aws_cdk import (
     Stack,
     aws_ec2 as ec2,
     CfnOutput,
-    CfnTag,
+    CfnTag,Environment
 )
 from constructs import Construct
 
