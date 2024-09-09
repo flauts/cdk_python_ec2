@@ -1,52 +1,55 @@
 from aws_cdk import (
     Stack,
     aws_ec2 as ec2,
+    aws_iam as iam,
     CfnOutput,
-    CfnTag,Environment
 )
+import aws_cdk.aws_codebuild as codebuild
+
 from constructs import Construct
 
 class CdkEc2Stack(Stack):
+
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # Create Basic VPC
-        # vpc = ec2.Vpc.from_vpc_attributes(
-        #     self,'vpc',
-        #     vpc_id='vpc-00efc54137e6a9ef2',
-        #     availability_zones=['us-east-1c','us-east-1f'],
-        #     subnet_ids=['subnet-00c42d57b278f4b67','subnet-0a73734857f8400a0'],
-        # )
-        vpc = ec2.Vpc(
-            self,
-            "cdk-ec2-vpc",
-            max_azs=2, #max_availabity zones
-            subnet_configuration=[
-                ec2.SubnetConfiguration(
-                    name="public-subnet-1",
-                    subnet_type=ec2.SubnetType.PUBLIC,
-                    cidr_mask=24,
-                )
-            ],
+        vpc = ec2.Vpc.from_vpc_attributes(
+            self,'vpc',
+            vpc_id='vpc-00efc54137e6a9ef2',
+            availability_zones=['us-east-1c','us-east-1f'],
+            public_subnet_ids=['subnet-00c42d57b278f4b67','subnet-0a73734857f8400a0'],
         )
+        # vpc = ec2.Vpc(
+        #     self,
+        #     "cdk-ec2-vpc",
+        #     max_azs=2, #max_availabity zones
+        #     subnet_configuration=[
+        #         ec2.SubnetConfiguration(
+        #             name="public-subnet-1",
+        #             subnet_type=ec2.SubnetType.PUBLIC,
+        #             cidr_mask=24,
+        #         )
+        #     ],
+        # )
 
         # Create Security Group
-        # sec_group = ec2.SecurityGroup.from_security_group_id(
-        #     self, 'launch-wizard-1','sg-0c77723568ab75889')
-        sec_group = ec2.SecurityGroup(
-            self, "sec-group-cdk-ec2", vpc=vpc, allow_all_outbound=True
-        )
+        sec_group = ec2.SecurityGroup.from_security_group_id(
+            self, 'launch-wizard-1','sg-0c77723568ab75889')
+        # sec_group = ec2.SecurityGroup(
+        #     self, "sec-group-cdk-ec2", vpc=vpc, allow_all_outbound=True
+        # )
 
         # Create Security Group Ingress Rule
-        sec_group.add_ingress_rule(
-            ec2.Peer.any_ipv4(), ec2.Port.tcp(22), "allow SSH access"
-        )
-        sec_group.add_ingress_rule(
-            ec2.Peer.any_ipv4(), ec2.Port.tcp(80), "allow HTTP access"
-        )
+        # sec_group.add_ingress_rule(
+        #     ec2.Peer.any_ipv4(), ec2.Port.tcp(22), "allow SSH access"
+        # )
+        # sec_group.add_ingress_rule(
+        #     ec2.Peer.any_ipv4(), ec2.Port.tcp(80), "allow HTTP access"
+        # )
 
         # Create Key Pair (use an existing key pair name for real usage)
-        key_name = "vockey"
+        key_name = ec2.KeyPair.from_key_pair_name(self,'cdk-ec2-keypair','vockey')
 
         # Create User Data Script
         user_data_script = ec2.UserData.for_linux()
@@ -60,13 +63,13 @@ class CdkEc2Stack(Stack):
         instance = ec2.Instance(
             self,
             "mv-cdk",
-            instance_type=ec2.InstanceType("t2.micro"),
+            instance_type=ec2.InstanceType("t2. micro"),
             machine_image=ec2.MachineImage.latest_amazon_linux2023(),
             vpc=vpc,
             security_group=sec_group,
             associate_public_ip_address=True,
-            key_name=key_name,
-            user_data=user_data_script
+            key_pair=key_name,
+            user_data=user_data_script,
         )
 
         # Output Instance ID

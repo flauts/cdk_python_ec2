@@ -2,8 +2,10 @@
 import os
 
 import aws_cdk as cdk
+from aws_cdk.aws_iam import IRole
 
 from cdk_python_websimple.cdk_ec2_stack import CdkEc2Stack
+
 
 
 app = cdk.App()
