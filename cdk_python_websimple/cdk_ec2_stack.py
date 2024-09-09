@@ -1,6 +1,7 @@
 from aws_cdk import (
     Stack,
     aws_ec2 as ec2,
+    aws_s3 as s3,
     aws_iam as iam,
     CfnOutput,
 )
@@ -32,6 +33,9 @@ class CdkEc2Stack(Stack):
         #         )
         #     ],
         # )
+
+        bucket = s3.Bucket.from_bucket_name(self, "ExistingBucket", "cf-templates-iw9mos24h2jo-us-east-1")
+
 
         # Create Security Group
         sec_group = ec2.SecurityGroup.from_security_group_id(
@@ -71,6 +75,7 @@ class CdkEc2Stack(Stack):
             key_pair=key_name,
             user_data=user_data_script,
         )
+        bucket.grant_read_write(instance.role)
 
         # Output Instance ID
         CfnOutput(self, "InstanceId", value=instance.instance_id)
