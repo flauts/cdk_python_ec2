@@ -4,7 +4,7 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_iam as iam,
     aws_s3_assets as assets,
-    CfnOutput,
+    CfnOutput, DefaultStackSynthesizer,
 )
 import aws_cdk.aws_codebuild as codebuild
 
@@ -34,8 +34,8 @@ class CdkEc2Stack(Stack):
         #         )
         #     ],
         # )
-
-        bucket = s3.Bucket.from_bucket_name(self, "ExistingBucket", "cf-templates-iw9mos24h2jo-us-east-1")
+        existing_bucket_name = "cf-templates-iw9mos24h2jo-us-east-1"
+        bucket = s3.Bucket.from_bucket_name(self, "ExistingBucket", existing_bucket_name)
         # cfn_role = iam.Role.from_role_arn(self, "LabRole", "arn:aws:iam::172067734210:role/LabRole")
 
         # Now use this bucket for assets
@@ -61,7 +61,13 @@ class CdkEc2Stack(Stack):
 
         # Create Key Pair (use an existing key pair name for real usage)
         key_name = ec2.KeyPair.from_key_pair_name(self,'cdk-ec2-keypair','vockey')
-
+        existing_role_arn = "arn:aws:iam::172067734210:role/LabRole"
+        self.synthesizer = DefaultStackSynthesizer(
+            file_assets_bucket_name=existing_bucket_name,
+            deployment_role_arn=existing_role_arn,
+            file_assets_role_arn=existing_role_arn,
+            qualifier="cdk"
+        )
         # Create User Data Script
         user_data_script = ec2.UserData.for_linux()
         user_data_script.add_commands(
