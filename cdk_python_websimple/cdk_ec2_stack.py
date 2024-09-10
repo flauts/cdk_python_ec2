@@ -3,6 +3,7 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_s3 as s3,
     aws_iam as iam,
+    aws_s3_assets as assets,
     CfnOutput,
 )
 import aws_cdk.aws_codebuild as codebuild
@@ -35,7 +36,19 @@ class CdkEc2Stack(Stack):
         # )
 
         bucket = s3.Bucket.from_bucket_name(self, "ExistingBucket", "cf-templates-iw9mos24h2jo-us-east-1")
+        bootstrap_role = iam.Role(self, "LabRole",
+                                  assumed_by=iam.ServicePrincipal("cloudformation.amazonaws.com"),
+                                  # or ec2.amazonaws.com, lambda.amazonaws.com, etc.
+                                  managed_policies=[
+                                      iam.ManagedPolicy.from_aws_managed_policy_name("AdministratorAccess")
+                                  ]
 
+            )
+        # Now use this bucket for assets
+        asset = assets.Asset(self, "MyAsset",
+                             path="./path/to/your/asset",
+                             bucket=asset_bucket
+                             )
 
         # Create Security Group
         sec_group = ec2.SecurityGroup.from_security_group_id(
@@ -68,7 +81,7 @@ class CdkEc2Stack(Stack):
             self,
             "mv-cdk",
             instance_type=ec2.InstanceType("t2. micro"),
-            machine_image=ec2.MachineImage.latest_amazon_linux2023(),
+            machine_image=ec2.MachineImage.generic_linux({"us-east-1":"ami-0aa28dab1f2852040"}),
             vpc=vpc,
             security_group=sec_group,
             associate_public_ip_address=True,
@@ -88,9 +101,4 @@ class CdkEc2Stack(Stack):
         CfnOutput(self, "websimpleURL",
                   value=f"http://{instance.instance_public_ip}/websimple",
                   description="URL de websimple"
-                  )
-
-        CfnOutput(self, "webplantillaURL",
-                  value=f"http://{instance.instance_public_ip}/webplantilla",
-                  description="URL de webplantilla"
                   )
