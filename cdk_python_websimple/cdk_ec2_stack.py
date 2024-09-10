@@ -39,10 +39,10 @@ class CdkEc2Stack(Stack):
         # cfn_role = iam.Role.from_role_arn(self, "LabRole", "arn:aws:iam::172067734210:role/LabRole")
 
         # Now use this bucket for assets
-        asset = assets.Asset(self, "MyAsset",
-                             path="./",
-                             bucket=bucket
-                             )
+        # asset = assets.Asset(self, "MyAsset",
+        #                      path="./",
+        #                      bucket=bucket
+        #                      )
 
         # Create Security Group
         sec_group = ec2.SecurityGroup.from_security_group_id(
