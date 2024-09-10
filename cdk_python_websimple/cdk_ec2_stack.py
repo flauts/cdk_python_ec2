@@ -3,11 +3,8 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_s3 as s3,
     aws_iam as iam,
-    aws_s3_assets as assets,
     CfnOutput, DefaultStackSynthesizer,
 )
-import aws_cdk.aws_codebuild as codebuild
-
 from constructs import Construct
 
 class CdkEc2Stack(Stack):
@@ -31,13 +28,9 @@ class CdkEc2Stack(Stack):
         # Create Key Pair (use an existing key pair name for real usage)
         key_name = 'vockey'
 
+        # Use the existing role
         existing_role_arn = "arn:aws:iam::172067734210:role/LabRole"
-        self.synthesizer = DefaultStackSynthesizer(
-            file_assets_bucket_name=existing_bucket_name,
-            deployment_role_arn=existing_role_arn,
-            file_assets_role_arn=existing_role_arn,
-            qualifier="cdk"
-        )
+        existing_role = iam.Role.from_role_arn(self, "ExistingRole", existing_role_arn)
 
         # Create User Data Script
         user_data_script = ec2.UserData.for_linux()
@@ -59,6 +52,7 @@ class CdkEc2Stack(Stack):
             security_group=sec_group,
             key_name=key_name,
             user_data=user_data_script,
+            role=existing_role,  # Use the existing role for the instance
         )
 
         # Grant read/write permissions to the instance for the S3 bucket
