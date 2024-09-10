@@ -64,7 +64,6 @@ class CdkEc2Stack(Stack):
         existing_role_arn = "arn:aws:iam::172067734210:role/LabRole"
         self.synthesizer = DefaultStackSynthesizer(
             file_assets_bucket_name=existing_bucket_name,
-            file_assets_role_arn=existing_role_arn,
             qualifier="cdk"
         )
         # Create User Data Script
