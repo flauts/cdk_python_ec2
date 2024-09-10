@@ -3,7 +3,7 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_s3 as s3,
     aws_iam as iam,
-    CfnOutput, DefaultStackSynthesizer,
+    CfnOutput,
 )
 from constructs import Construct
 
@@ -25,8 +25,8 @@ class CdkEc2Stack(Stack):
         sec_group = ec2.SecurityGroup.from_security_group_id(
             self, 'launch-wizard-1', 'sg-0c77723568ab75889')
 
-        # Create Key Pair (use an existing key pair name for real usage)
-        key_name = 'vockey'
+        # Use existing key pair
+        key_pair = ec2.KeyPair.from_key_pair_name(self, "ExistingKeyPair", "vockey")
 
         # Use the existing role
         existing_role_arn = "arn:aws:iam::172067734210:role/LabRole"
@@ -50,9 +50,9 @@ class CdkEc2Stack(Stack):
             vpc=vpc,
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             security_group=sec_group,
-            key_name=key_name,
+            key_pair=key_pair,  # Use key_pair instead of key_name
             user_data=user_data_script,
-            role=existing_role,  # Use the existing role for the instance
+            role=existing_role,
         )
 
         # Grant read/write permissions to the instance for the S3 bucket
