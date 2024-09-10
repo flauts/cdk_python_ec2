@@ -47,7 +47,7 @@ class CdkEc2Stack(Stack):
         # Now use this bucket for assets
         asset = assets.Asset(self, "MyAsset",
                              path="./path/to/your/asset",
-                             bucket=asset_bucket
+                             bucket=bucket
                              )
 
         # Create Security Group
@@ -80,7 +80,7 @@ class CdkEc2Stack(Stack):
         instance = ec2.Instance(
             self,
             "mv-cdk",
-            instance_type=ec2.InstanceType("t2. micro"),
+            instance_type=ec2.InstanceType("t2.micro"),
             machine_image=ec2.MachineImage.generic_linux({"us-east-1":"ami-0aa28dab1f2852040"}),
             vpc=vpc,
             security_group=sec_group,
