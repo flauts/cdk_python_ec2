@@ -36,17 +36,11 @@ class CdkEc2Stack(Stack):
         # )
 
         bucket = s3.Bucket.from_bucket_name(self, "ExistingBucket", "cf-templates-iw9mos24h2jo-us-east-1")
-        bootstrap_role = iam.Role(self, "LabRole",
-                                  assumed_by=iam.ServicePrincipal("cloudformation.amazonaws.com"),
-                                  # or ec2.amazonaws.com, lambda.amazonaws.com, etc.
-                                  managed_policies=[
-                                      iam.ManagedPolicy.from_aws_managed_policy_name("AdministratorAccess")
-                                  ]
+        # cfn_role = iam.Role.from_role_arn(self, "LabRole", "arn:aws:iam::172067734210:role/LabRole")
 
-            )
         # Now use this bucket for assets
         asset = assets.Asset(self, "MyAsset",
-                             path="./path/to/your/asset",
+                             path="./",
                              bucket=bucket
                              )
 
