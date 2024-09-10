@@ -50,7 +50,7 @@ class CdkEc2Stack(Stack):
             vpc=vpc,
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             security_group=sec_group,
-            key_pair=key_pair,  # Use key_pair instead of key_name
+            key_pair=key_pair,
             user_data=user_data_script,
             role=existing_role,
         )
