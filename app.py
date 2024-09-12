@@ -9,7 +9,7 @@ from cdk_python_websimple.cdk_ec2_stack import CdkEc2Stack
 
 
 app = cdk.App()
-CdkEc2Stack(app, "CdkEc2Stack",
+CdkEc2Stack(app, "PythonEC2CDK",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.

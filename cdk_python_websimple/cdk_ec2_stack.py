@@ -3,14 +3,26 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_s3 as s3,
     aws_iam as iam,
-    CfnOutput,
+    CfnOutput, IStackSynthesizer,
 )
+from aws_cdk import Environment, DefaultStackSynthesizer
 from constructs import Construct
 
 class CdkEc2Stack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
-        super().__init__(scope, construct_id, **kwargs)
+        # Define custom synthesizer
+        synthesizer = DefaultStackSynthesizer(
+            file_assets_bucket_name="cf-templates-iw9mos24h2jo-us-east-1",
+            cloud_formation_execution_role= "arn:aws:iam::172067734210:role/LabRole",
+            deploy_role_arn="arn:aws:iam::172067734210:role/LabRole",
+            file_asset_publishing_role_arn="arn:aws:iam::172067734210:role/LabRole",
+            deploy_role_external_id="arn:aws:iam::172067734210:role/LabRole",
+            image_asset_publishing_role_arn="arn:aws:iam::172067734210:role/LabRole",
+        )
+
+        # Pass the synthesizer to the Stack constructor
+        super().__init__(scope, construct_id, synthesizer=synthesizer, **kwargs)
 
         # Use existing VPC
         vpc = ec2.Vpc.from_lookup(
@@ -19,8 +31,6 @@ class CdkEc2Stack(Stack):
         )
 
         # Use existing bucket
-        existing_bucket_name = "cf-templates-iw9mos24h2jo-us-east-1"
-        bucket = s3.Bucket.from_bucket_name(self, "ExistingBucket", existing_bucket_name)
 
         # Use existing security group
         sec_group = ec2.SecurityGroup.from_security_group_id(
@@ -38,6 +48,7 @@ class CdkEc2Stack(Stack):
             "apt update",
             "apt install -y apache2 git",
             "git clone https://github.com/flauts/websimple.git /var/www/html/websimple"
+            "git clone https://github.com/flauts/webplantilla.git /var/www/html/webplantilla"
         )
 
         # Create EC2 instance
@@ -55,6 +66,7 @@ class CdkEc2Stack(Stack):
         )
 
         # Output Instance ID and Public IP
-        CfnOutput(self, "InstanceId", value=instance.instance_id)
+        CfnOutput(self, "EC2enCDKPython", value=instance.instance_id)
         CfnOutput(self, "InstancePublicIP", value=instance.instance_public_ip)
-        CfnOutput(self, "websimpleURL", value=f"http://{instance.instance_public_ip}/websimple")
+        CfnOutput(self, "websimpleURL0", value=f"http://{instance.instance_public_ip}/websimple")
+        CfnOutput(self, "webplantillaURL0", value=f"http://{instance.instance_public_ip}/webplantilla")
