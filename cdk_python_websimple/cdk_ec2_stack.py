@@ -30,19 +30,13 @@ class CdkEc2Stack(Stack):
             vpc_id='vpc-00efc54137e6a9ef2'
         )
 
-        # Use existing bucket
-
-        # Use existing security group
         sec_group = ec2.SecurityGroup.from_security_group_id(
             self, 'launch-wizard-1', 'sg-0c77723568ab75889')
 
-        # Use existing key pair
         key_pair = ec2.KeyPair.from_key_pair_name(self, "ExistingKeyPair", "vockey")
 
-        # Use the LabRole
         lab_role = iam.Role.from_role_arn(self, "LabRole", "arn:aws:iam::172067734210:role/LabRole")
 
-        # Create User Data Script
         user_data = ec2.UserData.for_linux()
         user_data.add_commands(
             "apt update",
@@ -51,7 +45,6 @@ class CdkEc2Stack(Stack):
             "git clone https://github.com/flauts/webplantilla.git /var/www/html/webplantilla"
         )
 
-        # Create EC2 instance
         instance = ec2.Instance(
             self,
             "mv-cdk",
@@ -62,7 +55,7 @@ class CdkEc2Stack(Stack):
             security_group=sec_group,
             key_pair=key_pair,
             user_data=user_data,
-            role=lab_role,  # Use LabRole for the instance
+            role=lab_role,
         )
 
         # Output Instance ID and Public IP
